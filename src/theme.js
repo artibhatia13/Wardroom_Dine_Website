@@ -4,7 +4,7 @@ import "@fontsource-variable/montserrat";
 let appTheme = createTheme({
   palette: {
     primary: {
-      light: "",
+      light: "#FF7753",
       main: "#FF5C30",
       dark: "",
       contrastText: "#fff",
@@ -39,8 +39,19 @@ let appTheme = createTheme({
     h4: {
       fontSize: "1.5rem",
     },
+    h5: {
+      fontSize: "1.3rem",
+    },
     subtitle1: {
       fontSize: "1.1rem",
+    },
+    subtitle2: {
+      fontSize: "0.8rem",
+      fontWeight: "700",
+    },
+    body1: {
+      fontSize: "1rem",
+      fontWeight: "400",
     },
   },
   components: {
@@ -63,6 +74,7 @@ let appTheme = createTheme({
           borderRadius: 20,
           height: "3rem",
           fontWeight: "600",
+          padding: "0 1.5rem 0 1.5rem",
         },
       },
     },

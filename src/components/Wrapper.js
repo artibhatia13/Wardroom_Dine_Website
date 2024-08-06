@@ -12,11 +12,12 @@ const Wrapper = ({ children }) => {
       width="100vw"
     >
       <Box
-        maxWidth={1500}
+        maxWidth={1700}
         sx={{
           width: "100%",
           height: "100%",
           bgcolor: "background.default",
+          boxShadow: "2px 4px 10px rgba(0, 0, 0, 0.2)",
         }}
       >
         {children}

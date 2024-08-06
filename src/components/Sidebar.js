@@ -4,7 +4,7 @@ import { Typography, Box } from "@mui/material";
 const Sidebar = () => {
   return (
     <Box
-      flex="0.3"
+      flex="0.25"
       sx={{
         backgroundColor: "white",
         height: "100vh",
