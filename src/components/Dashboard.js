@@ -1,6 +1,29 @@
+<<<<<<< HEAD
 import React from "react";
 import { Typography, Box } from "@mui/material";
 //import { CenterFocusStrong } from "@mui/icons-material";
+=======
+import React, { useEffect, useState } from "react";
+import {
+  Typography,
+  Box,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
+  Button,
+} from "@mui/material"; // Added missing imports
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  updateDoc,
+  arrayUnion,
+  doc,
+} from "firebase/firestore";
+import db from "../config/firestore";
+>>>>>>> 53aa8d59e51597429de608aa3a622a1df3162845
 
 const Dashboard = () => {
   return (

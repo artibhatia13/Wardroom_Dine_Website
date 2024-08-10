@@ -1,6 +1,6 @@
 import React from "react";
 import { ThemeProvider } from "@mui/material/styles";
-import Wrapper from "./wrapper";
+import Wrapper from "./components/Wrapper";
 import appTheme from "./theme";
 import SignUp from "./components/SignUp";
 import SignIn from "./components/SignIn";
