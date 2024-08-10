@@ -7,7 +7,9 @@ const AdminHomePage = () => {
   return (
     <Box display="flex">
       <Sidebar />
-      <Dashboard />
+      <Box flex="0.75" px={8} py={6}>
+        <Dashboard />
+      </Box>
     </Box>
   );
 };
