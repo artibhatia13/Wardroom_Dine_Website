@@ -12,6 +12,9 @@ import {
   Navigate,
 } from "react-router-dom";
 import AdminHomePage from "./components/AdminHomePage";
+import Dashboard from "./components/Dashboard";
+import MenuPage from "./components/MenuPage";
+import FeedbackPage from "./components/FeedbackPage";
 
 function App() {
   return (
@@ -24,8 +27,18 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/forgot-password" element={<SignIn />} />
 
-            <Route path="/dashboard" element={<AdminHomePage />} />
-            {/* <Route path="/view-menu" element={<Menu />} /> */}
+            <Route
+              path="/dashboard/*"
+              element={
+                <AdminHomePage>
+                  <Routes>
+                    <Route path="" element={<Dashboard />} />
+                    <Route path="menu" element={<MenuPage />} />
+                    <Route path="feedback" element={<FeedbackPage />} />
+                  </Routes>
+                </AdminHomePage>
+              }
+            />
           </Routes>
         </Router>
       </Wrapper>

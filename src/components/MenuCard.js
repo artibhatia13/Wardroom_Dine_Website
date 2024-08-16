@@ -10,18 +10,10 @@ import {
   TextField,
   Modal,
 } from "@mui/material"; // Added missing imports
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
-import db from "../config/firestore";
 import { LoadingButton } from "@mui/lab";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import { editMenu } from "../services/firestoreUtility";
 
 const MenuCard = ({
   mealName,
@@ -29,13 +21,19 @@ const MenuCard = ({
   mealImage,
   mealDate,
   refreshMenu,
+  menuId,
 }) => {
   const [open, setOpen] = useState(false);
   const [editedItems, setEditedItems] = useState([...mealItems]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setEditedItems((prevItems) =>
+      prevItems.filter((item) => item.trim() !== "")
+    );
+    setOpen(false);
+  };
 
   const handleAddItem = () => {
     setEditedItems([...editedItems, ""]);
@@ -46,56 +44,22 @@ const MenuCard = ({
     newItems[index] = value;
     setEditedItems(newItems);
   };
-  const unitId = "Xu0rDXPoC4BGxd6T1mFY";
 
   const handleSave = async () => {
-    console.log(editedItems);
+    console.log("inside");
     setIsLoading(true);
-    try {
-      const q = query(
-        collection(db, "weekly_menu"),
-        where("unit_id", "==", unitId)
-      );
-      const querySnapshot = await getDocs(q);
 
-      if (querySnapshot.empty) {
-        console.log("No matching documents.");
-        return;
-      }
-
-      const docSnapshot = querySnapshot.docs[0];
-      const docId = docSnapshot.id;
-      const menuList = docSnapshot.data().menu_list;
-      console.log(menuList);
-
-      const updatedMenuList = menuList.map((menuItem) => {
-        if (menuItem.date === mealDate) {
-          return {
-            ...menuItem,
-            meals: {
-              ...menuItem.meals,
-              [mealName]: editedItems,
-            },
-          };
-        }
-        return menuItem;
-      });
-
-      console.log(updatedMenuList);
-
-      // Update the document with the new menu list
-      const docRef = doc(db, "weekly_menu", docId);
-      await updateDoc(docRef, { menu_list: updatedMenuList });
-
-      console.log("Meal items updated successfully!");
+    // Remove empty items before saving
+    const filteredItems = editedItems.filter((item) => item.trim() !== "");
+    const isEdited = await editMenu(menuId, mealName, filteredItems);
+    console.log(isEdited);
+    if (isEdited) {
       refreshMenu();
-    } catch (error) {
-      console.error("Error updating meal items:", error);
+      handleClose();
+    } else {
+      //give alert
     }
-
     setIsLoading(false);
-
-    handleClose();
   };
 
   return (
@@ -140,8 +104,6 @@ const MenuCard = ({
           </Box>
         </CardContent>
       </Card>
-
-      {isLoading && <Box></Box>}
 
       <Modal open={open} onClose={handleClose}>
         <Box
