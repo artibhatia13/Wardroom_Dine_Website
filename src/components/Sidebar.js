@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Drawer } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
@@ -12,25 +12,25 @@ const sidebarContent = [
     id: 1,
     name: "Dashboard",
     link: "/dashboard/",
-    icon: <DashboardRoundedIcon fontSize="large" />,
+    icon: <DashboardRoundedIcon fontSize="medium" />,
   },
   {
     id: 2,
     name: "Headcount",
     link: "/dashboard/headcount",
-    icon: <GroupsRoundedIcon fontSize="large" />,
+    icon: <GroupsRoundedIcon fontSize="medium" />,
   },
   {
     id: 3,
     name: "Menu",
     link: "/dashboard/menu",
-    icon: <OutboxRoundedIcon fontSize="large" />,
+    icon: <OutboxRoundedIcon fontSize="medium" />,
   },
   {
     id: 4,
     name: "View Feedbacks",
     link: "/dashboard/feedbacks",
-    icon: <ThumbsUpDownRoundedIcon fontSize="large" />,
+    icon: <ThumbsUpDownRoundedIcon fontSize="medium" />,
   },
 ];
 
@@ -44,6 +44,7 @@ const Sidebar = () => {
         backgroundColor: "white",
         height: "100vh",
         borderRight: "1px solid #cfcfcf",
+        borderLeft: "1px solid #cfcfcf",
       }}
     >
       <Box
@@ -95,7 +96,6 @@ const Sidebar = () => {
               <Typography
                 variant="body1"
                 sx={{
-                  fontSize: "1.2rem",
                   fontWeight: "600",
                 }}
               >

@@ -1,10 +1,10 @@
 import React from "react";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Divider } from "@mui/material";
 //import { CenterFocusStrong } from "@mui/icons-material";
 
 const Dashboard = () => {
   return (
-    <Box>
+    <Box py={6}>
       <Box>
         <Box
           display="flex"
@@ -70,22 +70,7 @@ const Dashboard = () => {
           boxSizing: "border-box", // Include border in element's total width and height
         }}
       >
-        {/* New Row */}
-        <Box
-          sx={{
-            position: "absolute",
-            width: "865px", // Ensure row spans full width of parent container
-            height: "60px", // Set the height of the row to 10px
-            backgroundColor: "#white", // Background color for the row (optional)
-            borderBottom: "1px solid #B4B4B4", // Border at the bottom of the row
-            boxSizing: "border-box", // Include border in element's total width and height
-            //zIndex: 1,
-          }}
-        >
-          {/* Content for Row (e.g., a header or controls) */}
-        </Box>
-
-        {/* Column 1 */}
+        <Divider />
 
         <Box
           sx={{
