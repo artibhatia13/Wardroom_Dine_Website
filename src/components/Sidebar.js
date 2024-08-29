@@ -1,18 +1,42 @@
 import React from "react";
-import { Typography, Box } from "@mui/material";
-import {
-  List,
-  ListItemIcon,
-  ListItemText,
-  ListItemButton,
-  Drawer,
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import { Link, useLocation } from "react-router-dom";
 import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import OutboxRoundedIcon from "@mui/icons-material/OutboxRounded";
 import ThumbsUpDownRoundedIcon from "@mui/icons-material/ThumbsUpDownRounded";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+
+const sidebarContent = [
+  {
+    id: 1,
+    name: "Dashboard",
+    link: "/dashboard/",
+    icon: <DashboardRoundedIcon fontSize="large" />,
+  },
+  {
+    id: 2,
+    name: "Headcount",
+    link: "/dashboard/headcount",
+    icon: <GroupsRoundedIcon fontSize="large" />,
+  },
+  {
+    id: 3,
+    name: "Menu",
+    link: "/dashboard/menu",
+    icon: <OutboxRoundedIcon fontSize="large" />,
+  },
+  {
+    id: 4,
+    name: "View Feedbacks",
+    link: "/dashboard/feedbacks",
+    icon: <ThumbsUpDownRoundedIcon fontSize="large" />,
+  },
+];
 
 const Sidebar = () => {
+  const location = useLocation();
+
   return (
     <Box
       flex="0.25"
@@ -22,44 +46,65 @@ const Sidebar = () => {
         borderRight: "1px solid #cfcfcf",
       }}
     >
-      {/* <Drawer
-      sx={{
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          boxSizing: 'border-box',
-        },
-      }}
-      variant="permanent"
-      anchor="left"
-    > */}
-      <Box sx={{ margin: 2, padding: 1 }}></Box>
-      <List>
-        <ListItemButton>
-          <ListItemIcon>
-            <DashboardRoundedIcon />
-          </ListItemIcon>
-          <ListItemText primary="Dashboard" />
-        </ListItemButton>
-        <ListItemButton>
-          <ListItemIcon>
-            <GroupsRoundedIcon />
-          </ListItemIcon>
-          <ListItemText primary="Headcount" />
-        </ListItemButton>
-        <ListItemButton>
-          <ListItemIcon>
-            <OutboxRoundedIcon />
-          </ListItemIcon>
-          <ListItemText primary="Menu" />
-        </ListItemButton>
-        <ListItemButton>
-          <ListItemIcon>
-            <ThumbsUpDownRoundedIcon />
-          </ListItemIcon>
-          <ListItemText primary="Feedback" />
-        </ListItemButton>
-      </List>
-      {/* </Drawer> */}
+      <Box
+        display="flex"
+        p={3}
+        alignItems="center"
+        color="primary.dark"
+        sx={{ borderBottom: "1px solid #cfcfcf" }}
+      >
+        <Box sx={{ marginRight: "1rem" }}>
+          <StorefrontIcon fontSize="large" />
+        </Box>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: "600",
+            textTransform: "uppercase",
+          }}
+        >
+          valsura wardroom
+        </Typography>
+      </Box>
+      <Box mt={4}>
+        {sidebarContent.map((item) => (
+          <Link key={item.id} to={item.link} style={{ textDecoration: "none" }}>
+            <Box
+              display="flex"
+              alignItems="center"
+              padding="1.5rem 3.5rem"
+              sx={{
+                borderRadius: "4px",
+                backgroundColor:
+                  location.pathname === item.link
+                    ? "rgba(255, 92, 48, 0.16)"
+                    : "inherit",
+                color:
+                  location.pathname === item.link
+                    ? "customColors.black.main"
+                    : "customColors.grey.main",
+                "&:hover": {
+                  color:
+                    location.pathname === item.link
+                      ? "customColors.black.main"
+                      : "#5C5C5C",
+                },
+              }}
+            >
+              <Box sx={{ marginRight: "2rem" }}>{item.icon}</Box>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontSize: "1.2rem",
+                  fontWeight: "600",
+                }}
+              >
+                {item.name}
+              </Typography>
+            </Box>
+          </Link>
+        ))}
+      </Box>
     </Box>
   );
 };

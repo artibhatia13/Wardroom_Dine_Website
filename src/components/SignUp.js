@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import WelcomePage from "./WelcomePage";
 import { TextField, Button, Box, Typography, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { registerUser } from "../services/firestoreUtility";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
     name: "",
-    username: "",
+    email: "",
     password: "",
   });
 
@@ -23,8 +24,12 @@ const SignUp = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission
-    console.log("Form submitted", formData);
-    navigate("/dashboard");
+    const user = registerUser(formData.email, formData.password);
+
+    console.log("Success", user);
+    if (user) {
+      // navigate("/dashboard");
+    }
   };
 
   return (
@@ -65,9 +70,9 @@ const SignUp = () => {
             variant="outlined"
             required
             fullWidth
-            label="Username"
-            name="username"
-            value={formData.username}
+            label="Email"
+            name="email"
+            value={formData.email}
             onChange={handleChange}
           />
           <TextField
