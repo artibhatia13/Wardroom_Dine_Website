@@ -14,7 +14,8 @@ import {
 import AdminHomePage from "./components/AdminHomePage";
 import Dashboard from "./components/Dashboard";
 import MenuPage from "./components/MenuPage";
-import FeedbackPage from "./components/FeedbackPage";
+import Headcount from "./components/Headcount";
+import Feedback from "./components/Feedback";
 
 function App() {
   return (
@@ -34,7 +35,8 @@ function App() {
                   <Routes>
                     <Route path="" element={<Dashboard />} />
                     <Route path="menu" element={<MenuPage />} />
-                    <Route path="feedback" element={<FeedbackPage />} />
+                    <Route path="feedback" element={<Feedback />} />
+                    <Route path="headcount" element={<Headcount />} />
                   </Routes>
                 </AdminHomePage>
               }

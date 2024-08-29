@@ -1,6 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import Sidebar from "./Sidebar";
+import Feedback from "./Feedback";
 
 const AdminHomePage = ({ children }) => {
   return (

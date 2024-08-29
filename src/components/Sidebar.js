@@ -29,7 +29,7 @@ const sidebarContent = [
   {
     id: 4,
     name: "View Feedbacks",
-    link: "/dashboard/feedbacks",
+    link: "/dashboard/feedback",
     icon: <ThumbsUpDownRoundedIcon fontSize="large" />,
   },
 ];

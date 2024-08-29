@@ -11,7 +11,8 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_MESSAGING_APP_ID,
 };
 
-const app = getApps.length > 0 ? getApp() : initializeApp(firebaseConfig);
+console.log("Firebase API Key:", process.env.REACT_APP_FIREBASE_KEY);
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
 export const auth = getAuth(app);
