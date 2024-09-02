@@ -7,7 +7,8 @@ import {
   Button,
   Modal,
   OutlinedInput,
-} from "@mui/material"; // Added missing imports
+  Skeleton,
+} from "@mui/material";
 import UploadRoundedIcon from "@mui/icons-material/UploadRounded";
 import { LoadingButton } from "@mui/lab";
 import { styled } from "@mui/system";
@@ -32,8 +33,10 @@ const MenuPage = () => {
   const handleClose = () => setOpen(false);
 
   const getMenuData = async () => {
+    const unitId = "Xu0rDXPoC4BGxd6T1mFY";
+
     setLoading(true);
-    const data = await fetchMenu();
+    const data = await fetchMenu(unitId);
     console.log(data);
     setDailyMenu(data);
     setLoading(false);
@@ -41,7 +44,6 @@ const MenuPage = () => {
 
   useEffect(() => {
     getMenuData();
-    fetchFeedbacks();
   }, []);
 
   const refreshMenu = () => {
@@ -132,7 +134,7 @@ const MenuPage = () => {
   };
 
   return (
-    <Box>
+    <Box py={6}>
       <Box display="flex" justifyContent="space-between" mb={6}>
         <Typography
           variant="h3"
@@ -200,7 +202,19 @@ const MenuPage = () => {
           <UploadMenuForm />
         </>
       ) : (
-        <Typography variant="subtitle1">Loading...</Typography>
+        <Box>
+          <Skeleton variant="rounded" width="100%" height="90px" />
+          <Box display="flex" gap={4} justifyContent="center" mt={6}>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton
+                key={index}
+                variant="rounded"
+                width="300px"
+                height="350px"
+              />
+            ))}
+          </Box>
+        </Box>
       )}
     </Box>
   );

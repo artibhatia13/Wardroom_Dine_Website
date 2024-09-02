@@ -15,7 +15,8 @@ import AdminHomePage from "./components/AdminHomePage";
 import Dashboard from "./components/Dashboard";
 import MenuPage from "./components/MenuPage";
 import Headcount from "./components/Headcount";
-import Feedback from "./components/Feedback";
+import FeedbackPage from "./components/FeedbackPage";
+import VerifyUserPage from "./components/VerifyUserPage";
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/signup" />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/forgot-password" element={<SignIn />} />
+            <Route path="/signin" element={<SignIn />} />
 
             <Route
               path="/dashboard/*"
@@ -35,8 +36,9 @@ function App() {
                   <Routes>
                     <Route path="" element={<Dashboard />} />
                     <Route path="menu" element={<MenuPage />} />
-                    <Route path="feedback" element={<Feedback />} />
                     <Route path="headcount" element={<Headcount />} />
+                    <Route path="feedbacks" element={<FeedbackPage />} />
+                    <Route path="verifyuser" element={<VerifyUserPage />} />
                   </Routes>
                 </AdminHomePage>
               }

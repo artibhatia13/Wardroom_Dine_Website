@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import WelcomePage from "./WelcomePage";
 import { TextField, Button, Box, Typography, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../services/firestoreUtility";
+import { signUp } from "../services/firestoreUtility";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -21,14 +22,20 @@ const SignUp = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    const user = registerUser(formData.email, formData.password);
 
-    console.log("Success", user);
-    if (user) {
-      // navigate("/dashboard");
+    const response = await signUp(formData);
+    if (response.success) {
+      toast.success(response.message, {
+        position: "top-right",
+      });
+      navigate("/signin");
+    } else {
+      toast.error(`Error:${response.message}`, {
+        position: "top-right",
+      });
+      navigate("/dashboard/");
     }
   };
 
@@ -41,7 +48,7 @@ const SignUp = () => {
         <Typography
           variant="subtitle1"
           color="customColors.grey.dark"
-          sx={{ fontWeight: 500 }}
+          sx={{ fontWeight: 400 }}
         >
           Create a new Unit
         </Typography>
@@ -100,6 +107,18 @@ const SignUp = () => {
           >
             Sign Up
           </Button>
+          <Box sx={{ textAlign: "center", marginTop: "-10px" }}>
+            <Typography
+              component="span"
+              color="customColors.grey.dark"
+              sx={{ fontSize: "12px" }}
+            >
+              Already have an account?{" "}
+            </Typography>
+            <Link href="/signin" underline="always" sx={{ fontSize: "12px" }}>
+              Sign In
+            </Link>
+          </Box>
         </Box>
       </Box>
     </WelcomePage>

@@ -6,31 +6,38 @@ import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import OutboxRoundedIcon from "@mui/icons-material/OutboxRounded";
 import ThumbsUpDownRoundedIcon from "@mui/icons-material/ThumbsUpDownRounded";
 import StorefrontIcon from "@mui/icons-material/Storefront";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
 
 const sidebarContent = [
   {
     id: 1,
     name: "Dashboard",
     link: "/dashboard/",
-    icon: <DashboardRoundedIcon fontSize="large" />,
+    icon: <DashboardRoundedIcon fontSize="medium" />,
   },
   {
     id: 2,
     name: "Headcount",
     link: "/dashboard/headcount",
-    icon: <GroupsRoundedIcon fontSize="large" />,
+    icon: <GroupsRoundedIcon fontSize="medium" />,
   },
   {
     id: 3,
     name: "Menu",
     link: "/dashboard/menu",
-    icon: <OutboxRoundedIcon fontSize="large" />,
+    icon: <OutboxRoundedIcon fontSize="medium" />,
   },
   {
     id: 4,
     name: "View Feedbacks",
     link: "/dashboard/feedback",
-    icon: <ThumbsUpDownRoundedIcon fontSize="large" />,
+    icon: <ThumbsUpDownRoundedIcon fontSize="medium" />,
+  },
+  {
+    id: 5,
+    name: "Verify Users",
+    link: "/dashboard/verifyuser",
+    icon: <HowToRegIcon fontSize="medium" />,
   },
 ];
 
@@ -44,6 +51,7 @@ const Sidebar = () => {
         backgroundColor: "white",
         height: "100vh",
         borderRight: "1px solid #cfcfcf",
+        borderLeft: "1px solid #cfcfcf",
       }}
     >
       <Box
@@ -95,7 +103,6 @@ const Sidebar = () => {
               <Typography
                 variant="body1"
                 sx={{
-                  fontSize: "1.2rem",
                   fontWeight: "600",
                 }}
               >

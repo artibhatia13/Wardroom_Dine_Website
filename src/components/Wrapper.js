@@ -8,16 +8,15 @@ const Wrapper = ({ children }) => {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      height="100vh"
       width="100vw"
     >
       <Box
         maxWidth={1700}
         sx={{
           width: "100%",
-          height: "100%",
+          height: "100vh",
           bgcolor: "background.default",
-          boxShadow: "2px 4px 10px rgba(0, 0, 0, 0.2)",
+          borderRight: "1px solid #cfcfcf",
         }}
       >
         {children}
