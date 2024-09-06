@@ -7,6 +7,7 @@ import OutboxRoundedIcon from "@mui/icons-material/OutboxRounded";
 import ThumbsUpDownRoundedIcon from "@mui/icons-material/ThumbsUpDownRounded";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
+import { useUnitContext } from "../context/unitContext";
 
 const sidebarContent = [
   {
@@ -30,7 +31,7 @@ const sidebarContent = [
   {
     id: 4,
     name: "View Feedbacks",
-    link: "/dashboard/feedback",
+    link: "/dashboard/feedbacks",
     icon: <ThumbsUpDownRoundedIcon fontSize="medium" />,
   },
   {
@@ -43,6 +44,7 @@ const sidebarContent = [
 
 const Sidebar = () => {
   const location = useLocation();
+  const { unit } = useUnitContext();
 
   return (
     <Box
@@ -56,7 +58,8 @@ const Sidebar = () => {
     >
       <Box
         display="flex"
-        p={3}
+        px={3}
+        height="70px"
         alignItems="center"
         color="primary.dark"
         sx={{ borderBottom: "1px solid #cfcfcf" }}
@@ -71,7 +74,7 @@ const Sidebar = () => {
             textTransform: "uppercase",
           }}
         >
-          valsura wardroom
+          {unit.unit_name} wardroom
         </Typography>
       </Box>
       <Box mt={4}>

@@ -1,3 +1,5 @@
+// src/App.js
+
 import React from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import Wrapper from "./components/Wrapper";
@@ -17,33 +19,42 @@ import MenuPage from "./components/MenuPage";
 import Headcount from "./components/Headcount";
 import FeedbackPage from "./components/FeedbackPage";
 import VerifyUserPage from "./components/VerifyUserPage";
+import ForgotPassword from "./components/ForgotPassword";
+import AuthRoute from "./components/AuthRoute";
+import { UnitProvider } from "./context/unitContext";
 
 function App() {
   return (
     <ThemeProvider theme={appTheme}>
       <Wrapper>
         <Router>
-          {/* <Navigation /> */}
-          <Routes>
-            <Route path="/" element={<Navigate to="/signup" />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/signin" element={<SignIn />} />
+          <UnitProvider>
+            <Routes>
+              <Route path="/" element={<Navigate to="/sign-up" />} />
+              <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/sign-in" element={<SignIn />} />
 
-            <Route
-              path="/dashboard/*"
-              element={
-                <AdminHomePage>
-                  <Routes>
-                    <Route path="" element={<Dashboard />} />
-                    <Route path="menu" element={<MenuPage />} />
-                    <Route path="headcount" element={<Headcount />} />
-                    <Route path="feedbacks" element={<FeedbackPage />} />
-                    <Route path="verifyuser" element={<VerifyUserPage />} />
-                  </Routes>
-                </AdminHomePage>
-              }
-            />
-          </Routes>
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+
+              {/* Protected Route */}
+              <Route
+                path="/dashboard/*"
+                element={
+                  <AuthRoute authRequired={true}>
+                    <AdminHomePage>
+                      <Routes>
+                        <Route path="" element={<Dashboard />} />
+                        <Route path="menu" element={<MenuPage />} />
+                        <Route path="feedbacks" element={<FeedbackPage />} />
+                        <Route path="headcount" element={<Headcount />} />
+                        <Route path="verifyuser" element={<VerifyUserPage />} />
+                      </Routes>
+                    </AdminHomePage>
+                  </AuthRoute>
+                }
+              />
+            </Routes>
+          </UnitProvider>
         </Router>
       </Wrapper>
     </ThemeProvider>

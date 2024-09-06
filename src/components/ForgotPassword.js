@@ -2,57 +2,49 @@ import React, { useState } from "react";
 import WelcomePage from "./WelcomePage";
 import { LoadingButton } from "@mui/lab";
 import { TextField, Box, Typography, Link } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { signIn } from "../services/firestoreUtility";
+import { resetPassword } from "../services/firestoreUtility";
 import { toast } from "react-toastify";
 
-const SignIn = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [isLoading, setIsLoading] = useState(false);
-
-  const navigate = useNavigate();
+const ForgotPassword = () => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setEmail(e.target.value);
   };
 
   const handleSubmit = async (e) => {
-    setIsLoading(true);
     e.preventDefault();
+    setLoading(true);
 
-    const response = await signIn(formData.email, formData.password);
+    const response = await resetPassword(email);
+    console.log("response:", response);
     if (response.success) {
-      toast.success(response.message, {
+      toast.info(response.message, {
         position: "top-right",
       });
-      navigate("/dashboard");
     } else {
       toast.error(response.message, {
         position: "top-right",
       });
     }
-    setIsLoading(false);
+
+    setLoading(false);
   };
 
   return (
     <WelcomePage>
       <Box width="70%">
         <Typography variant="h3" color="primary.main" sx={{ fontWeight: 600 }}>
-          Welcome Back
+          Forgot Password?
         </Typography>
         <Typography
           variant="subtitle1"
           color="customColors.grey.dark"
           sx={{ fontWeight: 400 }}
+          mt={1}
         >
-          Login to your account
+          Enter your email to receive a password reset link
         </Typography>
         <Box
           component="form"
@@ -71,37 +63,19 @@ const SignIn = () => {
             fullWidth
             label="Email"
             name="email"
-            value={formData.email}
+            value={email}
             onChange={handleChange}
-            disabled={isLoading}
+            disabled={loading}
           />
-          <TextField
-            variant="outlined"
-            required
-            fullWidth
-            type="password"
-            label="Password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            disabled={isLoading}
-          />
-          <Link
-            href="/forgot-password"
-            underline="always"
-            sx={{ textAlign: "end", marginTop: "-10px" }}
-          >
-            Forgot password?
-          </Link>
           <LoadingButton
             type="submit"
             variant="contained"
             color="primary"
-            loading={isLoading}
+            loading={loading}
             loadingPosition="center"
-            sx={{ mt: 2 }}
+            sx={{ mt: 1 }}
           >
-            Sign In
+            Reset Password
           </LoadingButton>
           <Box sx={{ textAlign: "center", marginTop: "-10px" }}>
             <Typography
@@ -109,10 +83,10 @@ const SignIn = () => {
               color="customColors.grey.dark"
               sx={{ fontSize: "12px" }}
             >
-              Don't have an account?{" "}
+              Go to{" "}
             </Typography>
-            <Link href="/sign-up" underline="always" sx={{ fontSize: "12px" }}>
-              Sign Up
+            <Link href="/sign-in" underline="always" sx={{ fontSize: "12px" }}>
+              Sign In
             </Link>
           </Box>
         </Box>
@@ -121,4 +95,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default ForgotPassword;

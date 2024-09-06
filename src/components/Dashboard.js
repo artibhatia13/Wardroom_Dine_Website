@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useUnitContext } from "../context/unitContext";
+import { fetchPendingUserApprovals } from "../services/firestoreUtility";
 import {
   Typography,
   Table,
@@ -9,46 +11,42 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Skeleton,
 } from "@mui/material";
-
-const dummyData = [
-  {
-    name: "John Doe",
-    preference: "Veg",
-    breakfast: 5,
-    lunch: 3,
-    dinner: 2,
-  },
-  {
-    name: "Jane Smith",
-    preference: "Non-Veg",
-    breakfast: 4,
-    lunch: 6,
-    dinner: 5,
-  },
-  {
-    name: "Alice Johnson",
-    preference: "Veg",
-    breakfast: 7,
-    lunch: 2,
-    dinner: 4,
-  },
-];
+import { toast } from "react-toastify";
 
 const Dashboard = () => {
+  const { unit } = useUnitContext();
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState(null);
+
+  const getUsers = async (email) => {
+    setLoading(true);
+    const response = await fetchPendingUserApprovals(true, unit.id);
+    if (response.success) {
+      setUsers(response.data);
+    } else {
+      toast.error(response.message, {
+        position: "top-right",
+      });
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
   return (
-    <Box py={6}>
-      <Box>
+    <Box>
+      <Box mt={6} mb={5}>
         <Box
           display="flex"
-          padding={5}
-          //paddingBottom={10}
-          //height={10}
+          padding={6}
           justifyContent="space-around"
           sx={{
             backgroundColor: "white",
             borderRadius: "8px",
-            mb: 4,
           }}
         >
           <Box
@@ -64,7 +62,7 @@ const Dashboard = () => {
               Total Count
             </Typography>
             <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-              256
+              {unit.strength}
             </Typography>
           </Box>
           <Box
@@ -83,7 +81,7 @@ const Dashboard = () => {
               variant="h3"
               sx={{ fontWeight: "bold", color: "#6BBE6F" }}
             >
-              174
+              {unit.veg_count}
             </Typography>
           </Box>
           <Box
@@ -102,92 +100,112 @@ const Dashboard = () => {
               variant="h3"
               sx={{ fontWeight: "bold", color: "#FF4614" }}
             >
-              82
+              {unit.nonVeg_count}
             </Typography>
           </Box>
         </Box>
       </Box>
 
-      {/* Detailed Section */}
-      <TableContainer component={Paper} sx={{ boxShadow: "none" }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                  Name
-                </Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                  Preference
-                </Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                  Breakfast
-                </Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                  Lunch
-                </Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                  Dinner
-                </Typography>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {dummyData.map((row, index) => (
-              <TableRow key={index}>
+      {loading ? (
+        <>
+          <Box display="flex" flexDirection="column" gap={1}>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton
+                key={index}
+                variant="rounded"
+                width="100%"
+                height="90px"
+              />
+            ))}
+          </Box>
+        </>
+      ) : (
+        <TableContainer component={Paper} sx={{ boxShadow: "none" }}>
+          <Table>
+            <TableHead>
+              <TableRow>
                 <TableCell>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ color: "black", fontSize: "1.0rem" }}
-                  >
-                    {row.name}
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                    Name
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ color: "black", fontSize: "1.0rem" }}
-                  >
-                    {row.preference}
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                    Preference
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ color: "black", fontSize: "1.0rem" }}
-                  >
-                    {row.breakfast}
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                    Breakfast
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ color: "black", fontSize: "1.0rem" }}
-                  >
-                    {row.lunch}
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                    Lunch
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ color: "black", fontSize: "1.0rem" }}
-                  >
-                    {row.dinner}
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                    Dinner
                   </Typography>
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {users ? (
+                users.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ color: "black", fontSize: "1.0rem" }}
+                      >
+                        {row.name}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ color: "black", fontSize: "1.0rem" }}
+                      >
+                        {row.preference}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ color: "black", fontSize: "1.0rem" }}
+                      >
+                        {row.breakfast}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ color: "black", fontSize: "1.0rem" }}
+                      >
+                        {row.lunch}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ color: "black", fontSize: "1.0rem" }}
+                      >
+                        {row.dinner}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <Box backgroundColor="white" p={3}>
+                  <Typography variant="h5">No Users Yet.</Typography>
+                </Box>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </Box>
   );
 };

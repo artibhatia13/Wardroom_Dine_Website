@@ -1,16 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import WelcomePage from "./WelcomePage";
-import { TextField, Button, Box, Typography, Link } from "@mui/material";
+import { TextField, Box, Typography, Link } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { useNavigate } from "react-router-dom";
 import { signUp } from "../services/firestoreUtility";
 import { toast } from "react-toastify";
+import { useUnitContext } from "../context/unitContext";
 
 const SignUp = () => {
+  const { unit } = useUnitContext();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+    unitID: "",
   });
+
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -20,23 +30,55 @@ const SignUp = () => {
       ...formData,
       [name]: value,
     });
+
+    // Clear errors when user starts typing
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
   };
 
   const handleSubmit = async (e) => {
+    setIsLoading(true);
     e.preventDefault();
 
+    // Perform validation
+    let valid = true;
+    const newErrors = { email: "", password: "" };
+
+    // Check email format
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(formData.email)) {
+      newErrors.email = "Invalid email format.";
+      valid = false;
+    }
+
+    // Check password length
+    if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long.";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+
+    if (!valid) {
+      setIsLoading(false);
+      return;
+    } // Stop submission if form is invalid
+
     const response = await signUp(formData);
+    console.log("response:", response);
     if (response.success) {
       toast.success(response.message, {
         position: "top-right",
       });
-      navigate("/signin");
+      navigate("/sign-in");
     } else {
-      toast.error(`Error:${response.message}`, {
+      toast.error(response.message, {
         position: "top-right",
       });
-      navigate("/dashboard/");
     }
+    setIsLoading(false);
   };
 
   return (
@@ -71,8 +113,9 @@ const SignUp = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            sx={{ "& .MuiTextField-root": { borderRadius: "40px" } }}
+            disabled={isLoading}
           />
+
           <TextField
             variant="outlined"
             required
@@ -81,6 +124,9 @@ const SignUp = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
+            error={Boolean(errors.email)}
+            helperText={errors.email}
+            disabled={isLoading}
           />
           <TextField
             variant="outlined"
@@ -91,22 +137,20 @@ const SignUp = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
+            error={Boolean(errors.password)}
+            helperText={errors.password}
+            disabled={isLoading}
           />
-          <Link
-            href="/forgot-password"
-            underline="always"
-            sx={{ textAlign: "end", marginTop: "-10px" }}
-          >
-            Forgot password?
-          </Link>
-          <Button
+          <LoadingButton
             type="submit"
             variant="contained"
             color="primary"
+            loading={isLoading}
+            loadingPosition="center"
             sx={{ mt: 2 }}
           >
             Sign Up
-          </Button>
+          </LoadingButton>
           <Box sx={{ textAlign: "center", marginTop: "-10px" }}>
             <Typography
               component="span"
@@ -115,7 +159,7 @@ const SignUp = () => {
             >
               Already have an account?{" "}
             </Typography>
-            <Link href="/signin" underline="always" sx={{ fontSize: "12px" }}>
+            <Link href="/sign-in" underline="always" sx={{ fontSize: "12px" }}>
               Sign In
             </Link>
           </Box>

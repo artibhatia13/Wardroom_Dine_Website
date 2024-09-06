@@ -9,21 +9,26 @@ import {
   Divider,
 } from "@mui/material";
 import { fetchFeedbacks } from "../services/firestoreUtility";
-import { formatDate } from "../services/utility";
+import { formatDateToString } from "../services/utility";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import { useUnitContext } from "../context/unitContext";
+import { toast } from "react-toastify";
 
 const Feedback = () => {
   const [loading, setLoading] = useState(false);
-  const [feedbacks, setFeedbacks] = useState([]);
+  const [feedbacks, setFeedbacks] = useState(null);
+  const { unit } = useUnitContext();
 
-  const unitId = "Xu0rDXPoC4BGxd6T1mFY";
   const getFeedbacks = async () => {
     setLoading(true);
-    console.log("here");
-    const feedbacks = await fetchFeedbacks(unitId);
-    console.log("feedbackkkk", feedbacks);
-    setFeedbacks(feedbacks);
+    const response = await fetchFeedbacks(unit.id);
+    if (response.success) setFeedbacks(response.data);
+    else {
+      toast.error(response.message, {
+        position: "top-right",
+      });
+    }
     setLoading(false);
   };
 
@@ -42,7 +47,7 @@ const Feedback = () => {
         </Typography>
       </Box>
 
-      {loading || feedbacks.length <= 0 ? (
+      {loading ? (
         <>
           <Box display="flex" flexDirection="column" gap={3} mt={6}>
             {Array.from({ length: 3 }).map((_, index) => (
@@ -55,9 +60,9 @@ const Feedback = () => {
             ))}
           </Box>
         </>
-      ) : (
+      ) : feedbacks ? (
         <Box mt={6}>
-          {feedbacks.map((item, index) => (
+          {feedbacks.map((item) => (
             <FeedbackItem
               key={item.id}
               date={item.date}
@@ -67,6 +72,10 @@ const Feedback = () => {
               menuItem={item.menu_item}
             />
           ))}
+        </Box>
+      ) : (
+        <Box backgroundColor="white" p={3} mt={6}>
+          <Typography variant="h5">No Feedbacks Yet.</Typography>
         </Box>
       )}
     </Box>
@@ -104,7 +113,7 @@ const FeedbackItem = ({ date, mealType, feedback, userName, menuItem }) => {
           width: "100%",
         }}
       >
-        <Typography variant="subtitle2">{formatDate(date)}</Typography>
+        <Typography variant="subtitle2">{formatDateToString(date)}</Typography>
         <Box
           display="flex"
           alignItems="center"

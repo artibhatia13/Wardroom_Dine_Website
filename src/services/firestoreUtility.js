@@ -11,53 +11,19 @@ import {
   setDoc,
   query,
   doc,
+  orderBy,
 } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendEmailVerification,
+  sendPasswordResetEmail,
   signOut,
+  onAuthStateChanged,
 } from "firebase/auth";
-import { v4 as uuidv4 } from "uuid";
-
-const sampleMenu = {
-  unit_id: "Xu09DXPoC4BGxd6T1mFY",
-  date: "12-08-2024",
-  day: "Sun",
-  breakfast_count: 0,
-  lunch_count: 0,
-  dinner_count: 0,
-  breakfast: ["Idli", "coconut chutney", "sambhar", "dalia", "milk/ coffee"],
-  lunch: ["rice/ roti", "daal", "aalo bhindi", "paneer masala", "brownie"],
-  dinner: [
-    "rice/ roti",
-    "mix daal",
-    "aalo gobi",
-    "palak paneer",
-    "milk/ coffee",
-  ],
-};
-
-const generateUniqueUserId = async () => {
-  let isUnique = false;
-  let userId;
-
-  // Keep generating a new ID until a unique one is found
-  while (!isUnique) {
-    userId = uuidv4().replace(/-/g, "").substring(0, 8); // Generate 8-character ID
-    const docRef = doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
-
-    if (!docSnap.exists()) {
-      isUnique = true;
-    }
-  }
-
-  return userId;
-};
+import { FastfoodOutlined } from "@mui/icons-material";
 
 export const signUp = async (formData) => {
-  console.log("formdata:", formData);
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
@@ -65,29 +31,18 @@ export const signUp = async (formData) => {
       formData.password
     );
     const user = userCredential.user;
-    console.log("successful creae user ,user:", formData);
+
     await sendEmailVerification(user);
-    console.log("Verification email sent.");
+
     alert(
       "Verification email sent. Please verify your email before signing in."
     );
-    const userId = await generateUniqueUserId();
+
+    // Store formData temporarily
+    localStorage.setItem("newUnitDetails", JSON.stringify(formData));
 
     // Sign out the user to prevent access until email is verified
     await signOut(auth);
-
-    // Add new user to "users" collection in Firestore with generated ID
-    const userDocRef = doc(db, "units", userId);
-    await setDoc(userDocRef, {
-      unit_name: formData.name,
-      strength: 0,
-      veg_count: 0,
-      nonVeg_count: 0,
-      breakfast_count: { veg: 0, non_veg: 0 },
-      lunch_count: { veg: 0, non_veg: 0 },
-      dinner_count: { veg: 0, non_veg: 0 },
-      email: formData.email,
-    });
 
     return {
       success: true,
@@ -100,7 +55,6 @@ export const signUp = async (formData) => {
   }
 };
 
-// Function to Sign-In a User
 export const signIn = async (email, password) => {
   try {
     const userCredential = await signInWithEmailAndPassword(
@@ -118,63 +72,123 @@ export const signIn = async (email, password) => {
       };
     }
 
-    return { success: true, message: "Sign-in successful." };
+    const storedUserData = JSON.parse(localStorage.getItem("newUnitDetails"));
+
+    if (storedUserData && storedUserData.email === email) {
+      const newUser = {
+        unit_name: storedUserData.name,
+        unit_id: storedUserData.unitID,
+        strength: 0,
+        veg_count: 0,
+        nonVeg_count: 0,
+        email: storedUserData.email,
+      };
+
+      const docRef = await addDoc(collection(db, "units"), newUser);
+
+      // Clear the temporary storage
+      localStorage.removeItem("newUnitDetails");
+    }
+
+    return { success: true, message: "successfully signed in" };
   } catch (error) {
     console.error("Error signing in:", error.message);
     return { success: false, message: error.message };
   }
 };
 
-export const fetchMenu = async (unitId) => {
-  const weekdayOrder = {
-    Mon: 1,
-    Tue: 2,
-    Wed: 3,
-    Thu: 4,
-    Fri: 5,
-    Sat: 6,
-    Sun: 7,
-  };
-
-  const q = query(collection(db, "daily_menu"), where("unit_id", "==", unitId));
-  let menuData = [];
+export const resetPassword = async (email) => {
   try {
-    const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) {
-      console.log("No matching documents found!");
-    } else {
-      menuData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      menuData.sort((a, b) => weekdayOrder[a.day] - weekdayOrder[b.day]);
-    }
-    return menuData;
+    await sendPasswordResetEmail(auth, email);
+    return {
+      success: true,
+      message: "If this email is registered, a reset link will be sent.",
+    };
   } catch (error) {
-    console.error("Error fetching menu:", error);
-    return [];
+    return { success: false, message: error.message };
   }
 };
 
-export const addDocument = async () => {
-  console.log("inside func", sampleMenu);
+export const fetchTodaysMenu = async (unitID, date) => {
+  const q = query(
+    collection(db, "daily_menus"),
+    where("unit_id", "==", unitID),
+    where("date", "==", date)
+  );
+
   try {
-    const docRef = await addDoc(collection(db, "daily_menu"), sampleMenu);
-    console.log("success", docRef.id);
-    return docRef.id;
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      return { success: true, data: null };
+    } else {
+      const doc = querySnapshot.docs[0];
+      const menu = { id: doc.id, ...doc.data() };
+      console.log("menu", menu);
+      return { success: true, data: menu };
+    }
+  } catch (error) {
+    console.error("Error fetching menu:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+export const fetchMenu = async (unitId, startDate, endDate) => {
+  const menusQuery = query(
+    collection(db, "daily_menus"),
+    where("unit_id", "==", unitId),
+    where("date", ">=", startDate),
+    where("date", "<=", endDate),
+    orderBy("date", "asc")
+  );
+
+  try {
+    const querySnapshot = await getDocs(menusQuery);
+
+    if (querySnapshot.empty) {
+      return { success: true, data: [] };
+    } else {
+      const menuData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      return { success: true, data: menuData };
+    }
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+export const addDocument = async (dailyMenu) => {
+  try {
+    const menuCollection = collection(db, "daily_menus");
+    const q = query(menuCollection, where("date", "==", dailyMenu.date));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      return {
+        success: false,
+        message: `Menu for ${dailyMenu.date} already exists.`,
+      };
+    }
+
+    const docRef = await addDoc(collection(db, "daily_menus"), dailyMenu);
+
+    console.log("Document successfully added with ID:", docRef.id);
+    return { success: true };
   } catch (e) {
-    console.error("Error adding document: ", e);
+    return {
+      success: false,
+      message: e,
+    };
   }
 };
 
 export const editMenu = async (menuId, mealName, menuItems) => {
   try {
-    console.log("insie func", menuId, mealName, menuItems);
-    const menuDocRef = doc(db, "daily_menu", menuId);
+    const menuDocRef = doc(db, "daily_menus", menuId);
     await updateDoc(menuDocRef, {
       [mealName]: menuItems,
     });
-    console.log("after update");
     return true;
   } catch (e) {
     console.error("Error editing menu ", e);
@@ -184,23 +198,20 @@ export const editMenu = async (menuId, mealName, menuItems) => {
 
 export const fetchFeedbacks = async (unitId) => {
   const q = query(collection(db, "feedback"), where("unit_id", "==", unitId));
-  let feedbacks = [];
 
   try {
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) {
-      console.log("No matching documents found!");
+      return { success: true, data: null };
     } else {
-      feedbacks = querySnapshot.docs.map((doc) => ({
+      const feedbacks = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
+      return { success: true, data: feedbacks };
     }
-    console.log(feedbacks);
-    return feedbacks;
   } catch (error) {
-    console.error("Error fetching menu:", error);
-    return [];
+    return { success: false, message: error.message };
   }
 };
 
@@ -219,5 +230,76 @@ export const fetchUnitData = async (unitId) => {
   } catch (error) {
     console.error("Error fetching unit data: ", error);
     return false;
+  }
+};
+
+export const fetchUnitDataByEmail = async (email) => {
+  try {
+    const q = query(collection(db, "units"), where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const doc = querySnapshot.docs[0];
+      const unitData = { id: doc.id, ...doc.data() };
+      console.log("res:", unitData);
+      return { success: true, data: unitData };
+    } else {
+      return { success: false, message: "No unit found with this email." };
+    }
+  } catch (error) {
+    console.error("Error fetching unit data:", error.message);
+    return { success: false, message: error.message };
+  }
+};
+
+export const logoutUser = async () => {
+  try {
+    await signOut(auth);
+    console.log("User successfully logged out.");
+    return { success: true, message: "Successfully logged out" };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+export const fetchPendingUserApprovals = async (isApproved, unitID) => {
+  try {
+    const q = query(
+      collection(db, "users"),
+      where("unit_id", "==", unitID),
+      where("is_approved", "==", isApproved)
+    );
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const pendingRequets = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      return { success: true, data: pendingRequets };
+    } else {
+      return { success: true, data: null };
+    }
+  } catch (error) {
+    console.error("Error fetching pending requests :", error.message);
+    return { success: false, message: error.message };
+  }
+};
+
+export const approveUserRequest = async (userID) => {
+  try {
+    const userRef = doc(db, "users", userID);
+    const userSnapshot = await getDoc(userRef);
+
+    if (!userSnapshot.exists()) {
+      console.error("User not found");
+      return { success: false, message: "User not found" };
+    }
+
+    await updateDoc(userRef, { is_approved: true });
+
+    return { success: true, message: "User approved successfully" };
+  } catch (error) {
+    console.error("Error approving user:", error);
+    return { success: false, message: "Error approving user" };
   }
 };

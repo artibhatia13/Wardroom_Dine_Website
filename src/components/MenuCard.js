@@ -14,6 +14,7 @@ import { LoadingButton } from "@mui/lab";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import { editMenu } from "../services/firestoreUtility";
+import { toast } from "react-toastify";
 
 const MenuCard = ({
   mealName,
@@ -46,18 +47,21 @@ const MenuCard = ({
   };
 
   const handleSave = async () => {
-    console.log("inside");
     setIsLoading(true);
 
     // Remove empty items before saving
     const filteredItems = editedItems.filter((item) => item.trim() !== "");
     const isEdited = await editMenu(menuId, mealName, filteredItems);
-    console.log(isEdited);
     if (isEdited) {
       refreshMenu();
+      toast.success("Successfully updated Menu!", {
+        position: "top-right",
+      });
       handleClose();
     } else {
-      //give alert
+      toast.error("Error in editing Menu", {
+        position: "top-right",
+      });
     }
     setIsLoading(false);
   };
@@ -157,6 +161,7 @@ const MenuCard = ({
               Cancel
             </Button>
             <LoadingButton
+              type="submit"
               variant="contained"
               color="primary"
               onClick={handleSave}

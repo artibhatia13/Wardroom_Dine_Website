@@ -5,46 +5,60 @@ import {
   Tabs,
   Tab,
   Button,
-  Modal,
-  OutlinedInput,
   Skeleton,
+  IconButton,
 } from "@mui/material";
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import UploadRoundedIcon from "@mui/icons-material/UploadRounded";
-import { LoadingButton } from "@mui/lab";
-import { styled } from "@mui/system";
 import MenuCard from "./MenuCard";
-import {
-  addDocument,
-  fetchMenu,
-  fetchFeedbacks,
-} from "../services/firestoreUtility";
-
-const StyledInput = styled("input")({
-  display: "none",
-});
+import { addDocument, fetchMenu } from "../services/firestoreUtility";
+import { getCurrentWeekDates, getDayOfWeek } from "../services/utility";
+import { toast } from "react-toastify";
+import { useUnitContext } from "../context/unitContext";
+import UploadMenuForm from "./UploadMenu";
 
 const MenuPage = () => {
   const [dailyMenu, setDailyMenu] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [startIndex, setStartIndex] = useState(0); // State for controlling which set of tabs to show
+  const { unit } = useUnitContext();
+  const tabsPerPage = 7; // Number of tabs to display at a time
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const getMenuData = async () => {
-    const unitId = "Xu0rDXPoC4BGxd6T1mFY";
-
     setLoading(true);
-    const data = await fetchMenu(unitId);
-    console.log(data);
-    setDailyMenu(data);
+    const { start, end } = getCurrentWeekDates();
+
+    const response = await fetchMenu(unit.id, start, end);
+    if (response.success) setDailyMenu(response.data);
+    else {
+      toast.error(response.message, {
+        position: "top-right",
+      });
+    }
     setLoading(false);
   };
 
   useEffect(() => {
     getMenuData();
   }, []);
+
+  const CalculateActiveTab = () => {
+    const today = new Date().toLocaleDateString("en-GB").replace(/\//g, "-"); // Format as DD-MM-YYYY
+    const defaultIndex = dailyMenu.findIndex((menu) => menu.date === today);
+    return defaultIndex === -1 ? 0 : defaultIndex;
+  };
+
+  useEffect(() => {
+    if (dailyMenu.length > 0) {
+      setStartIndex(0);
+      setSelectedTab(CalculateActiveTab);
+    }
+  }, [dailyMenu]);
 
   const refreshMenu = () => {
     getMenuData();
@@ -54,7 +68,8 @@ const MenuPage = () => {
     setSelectedTab(newValue);
   };
 
-  const tabItem = (day, date) => {
+  const tabItem = (date) => {
+    const day = getDayOfWeek(date);
     return (
       <Box sx={{ textAlign: "center" }}>
         <Typography variant="subtitle2" mb={1}>
@@ -65,72 +80,21 @@ const MenuPage = () => {
     );
   };
 
-  const UploadMenuForm = () => {
-    return (
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            borderRadius: "16px",
-            p: 6,
-          }}
-        >
-          <Typography variant="h4" sx={{ mb: 3, fontWeight: "500" }}>
-            Upload Menu
-          </Typography>
-          <OutlinedInput
-            fullWidth
-            readOnly
-            // value={fileName}
-            placeholder="Choose a file"
-            sx={{ mb: 2, paddingRight: "0" }}
-            endAdornment={
-              <label htmlFor="upload-button">
-                <StyledInput
-                  id="upload-button"
-                  type="file"
-                  accept=".xlsx, .xls"
-                  // onChange={handleFileChange}
-                />
-                <Box
-                  px={2}
-                  display="flex"
-                  alignItems="center"
-                  sx={{
-                    backgroundColor: "customColors.grey.light",
-                    height: "4rem",
-                    borderRadius: "0 16px 16px 0",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Typography variant="subtitle1">Browse</Typography>
-                </Box>
-              </label>
-            }
-          />
+  // Handle scrolling to the previous set of tabs
+  const handlePrev = () => {
+    setStartIndex((prev) => Math.max(0, prev - tabsPerPage));
+    setSelectedTab(CalculateActiveTab);
+    console.log(startIndex);
+  };
 
-          <LoadingButton
-            variant="contained"
-            color="primary"
-            // onClick={handleSave}
-            // loading={isLoading}
-            loadingPosition="start"
-            sx={{
-              width: "8rem",
-              height: "2.4rem",
-            }}
-          >
-            Upload
-          </LoadingButton>
-        </Box>
-      </Modal>
+  // Handle scrolling to the next set of tabs
+  const handleNext = () => {
+    setStartIndex((prev) =>
+      Math.min(dailyMenu.length - tabsPerPage, prev + tabsPerPage)
     );
+    console.log(startIndex);
+
+    setSelectedTab(0);
   };
 
   return (
@@ -156,51 +120,78 @@ const MenuPage = () => {
           Upload Menu
         </Button>
       </Box>
-      {dailyMenu.length > 0 ? (
-        <>
-          <Tabs
-            value={selectedTab}
-            onChange={handleChange}
-            // variant="scrollable"
-            variant="fullWidth"
-            scrollButtons="auto"
-          >
-            {dailyMenu.map((menuItem, index) => (
-              <Tab key={index} label={tabItem(menuItem.day, menuItem.date)} />
-            ))}
-          </Tabs>
-          {dailyMenu.map((menuItem, index) => (
-            <Box key={index} hidden={selectedTab !== index} mt={6}>
-              <Box display="flex" gap={4} justifyContent="center">
-                <MenuCard
-                  mealName="breakfast"
-                  mealItems={menuItem.breakfast}
-                  mealImage="/images/breakfast.jpg"
-                  mealDate={menuItem.date}
-                  menuId={menuItem.id}
-                  refreshMenu={refreshMenu}
-                />
-                <MenuCard
-                  mealName="lunch"
-                  mealItems={menuItem.lunch}
-                  mealImage="/images/lunch.jpg"
-                  mealDate={menuItem.date}
-                  menuId={menuItem.id}
-                  refreshMenu={refreshMenu}
-                />
-                <MenuCard
-                  mealName="dinner"
-                  mealItems={menuItem.dinner}
-                  mealImage="/images/dinner.jpg"
-                  mealDate={menuItem.date}
-                  menuId={menuItem.id}
-                  refreshMenu={refreshMenu}
-                />
-              </Box>
+      {!loading ? (
+        dailyMenu ? (
+          <>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <IconButton onClick={handlePrev} disabled={startIndex === 0}>
+                <ChevronLeft />
+              </IconButton>
+              <Tabs
+                value={selectedTab}
+                onChange={handleChange}
+                variant="scrollable"
+                scrollButtons="auto"
+              >
+                {dailyMenu
+                  .slice(startIndex, startIndex + tabsPerPage)
+                  .map((menuItem, index) => (
+                    <Tab
+                      key={index + startIndex}
+                      label={tabItem(menuItem.date)}
+                    />
+                  ))}
+              </Tabs>
+              <IconButton
+                onClick={handleNext}
+                disabled={startIndex + tabsPerPage >= dailyMenu.length}
+              >
+                <ChevronRight />
+              </IconButton>
             </Box>
-          ))}
-          <UploadMenuForm />
-        </>
+            {dailyMenu.map((menuItem, index) => (
+              <Box key={index} hidden={selectedTab !== index} mt={6}>
+                <Box display="flex" gap={4} justifyContent="center">
+                  <MenuCard
+                    mealName="breakfast"
+                    mealItems={menuItem.breakfast}
+                    mealImage="/images/breakfast.jpg"
+                    mealDate={menuItem.date}
+                    menuId={menuItem.id}
+                    refreshMenu={refreshMenu}
+                  />
+                  <MenuCard
+                    mealName="lunch"
+                    mealItems={menuItem.lunch}
+                    mealImage="/images/lunch.jpg"
+                    mealDate={menuItem.date}
+                    menuId={menuItem.id}
+                    refreshMenu={refreshMenu}
+                  />
+                  <MenuCard
+                    mealName="dinner"
+                    mealItems={menuItem.dinner}
+                    mealImage="/images/dinner.jpg"
+                    mealDate={menuItem.date}
+                    menuId={menuItem.id}
+                    refreshMenu={refreshMenu}
+                  />
+                </Box>
+              </Box>
+            ))}
+            <UploadMenuForm open={open} handleClose={handleClose} />
+          </>
+        ) : (
+          <Box backgroundColor="white" p={3}>
+            <Typography variant="h5">
+              Menu not uploaded for the week.
+            </Typography>
+          </Box>
+        )
       ) : (
         <Box>
           <Skeleton variant="rounded" width="100%" height="90px" />
