@@ -1,5 +1,5 @@
 export const formatDateToString = (dateString) => {
-  const [day, month, year] = dateString.split("-");
+  const [year, month, day] = dateString.split("-");
   const date = new Date(`${year}-${month}-${day}`);
   console.log("herreee");
 
@@ -11,16 +11,17 @@ export const formatDateToString = (dateString) => {
   }).format(date);
 };
 
-// format the date as "11-08-2024"
+// format the date as "2024-08-11"
 export const formatDate = (date) => {
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
   const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
+  return `${year}-${month}-${day}`;
 };
 
 export const getDayOfWeek = (dateString) => {
-  const date = new Date(dateString.split("-").reverse().join("-")); // Convert to YYYY-MM-DD format
+  console.log("dateString", dateString);
+  const date = new Date(dateString); // Parse the date string into a Date object
   const options = { weekday: "short" }; // 'short' for Mon, Tue, etc.
   return new Intl.DateTimeFormat("en-US", options).format(date);
 };

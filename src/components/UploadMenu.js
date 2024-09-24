@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import * as XLSX from "xlsx";
 import { addDocument } from "../services/firestoreUtility";
 
-const UploadMenuForm = ({ open, handleClose }) => {
+const UploadMenuForm = ({ open, handleClose, refreshMenu }) => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -64,12 +64,9 @@ const UploadMenuForm = ({ open, handleClose }) => {
 
         const convertExcelDate = (excelDate) => {
           const date = new Date((excelDate - (25567 + 2)) * 86400 * 1000); // Convert Excel serial date to JavaScript date
-          const formattedDate = `${date
-            .getDate()
+          const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
             .toString()
-            .padStart(2, "0")}-${(date.getMonth() + 1)
-            .toString()
-            .padStart(2, "0")}-${date.getFullYear()}`;
+            .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
           return formattedDate;
         };
 
@@ -115,6 +112,7 @@ const UploadMenuForm = ({ open, handleClose }) => {
             });
           }
         }
+        refreshMenu();
       };
     } catch (error) {
       console.error("Error processing file:", error);

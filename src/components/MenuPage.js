@@ -12,7 +12,11 @@ import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import UploadRoundedIcon from "@mui/icons-material/UploadRounded";
 import MenuCard from "./MenuCard";
 import { addDocument, fetchMenu } from "../services/firestoreUtility";
-import { getCurrentWeekDates, getDayOfWeek } from "../services/utility";
+import {
+  getCurrentWeekDates,
+  getDayOfWeek,
+  formatDateToString,
+} from "../services/utility";
 import { toast } from "react-toastify";
 import { useUnitContext } from "../context/unitContext";
 import UploadMenuForm from "./UploadMenu";
@@ -75,7 +79,9 @@ const MenuPage = () => {
         <Typography variant="subtitle2" mb={1}>
           {day}
         </Typography>
-        <Typography variant="subtitle1">{date}</Typography>
+        <Typography variant="subtitle1" sx={{ textTransform: "capitalize" }}>
+          {formatDateToString(date)}
+        </Typography>
       </Box>
     );
   };
@@ -121,7 +127,7 @@ const MenuPage = () => {
         </Button>
       </Box>
       {!loading ? (
-        dailyMenu ? (
+        dailyMenu.length > 0 ? (
           <>
             <Box
               display="flex"
@@ -183,7 +189,6 @@ const MenuPage = () => {
                 </Box>
               </Box>
             ))}
-            <UploadMenuForm open={open} handleClose={handleClose} />
           </>
         ) : (
           <Box backgroundColor="white" p={3}>
@@ -207,6 +212,11 @@ const MenuPage = () => {
           </Box>
         </Box>
       )}
+      <UploadMenuForm
+        open={open}
+        handleClose={handleClose}
+        refreshMenu={refreshMenu}
+      />
     </Box>
   );
 };

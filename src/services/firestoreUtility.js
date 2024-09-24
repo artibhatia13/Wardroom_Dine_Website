@@ -140,17 +140,21 @@ export const fetchMenu = async (unitId, startDate, endDate) => {
     where("date", "<=", endDate),
     orderBy("date", "asc")
   );
+  console.log(startDate, endDate, unitId);
 
   try {
     const querySnapshot = await getDocs(menusQuery);
 
     if (querySnapshot.empty) {
+      console.log("empty");
       return { success: true, data: [] };
     } else {
       const menuData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
+      console.log("menuData", menuData);
+
       return { success: true, data: menuData };
     }
   } catch (error) {

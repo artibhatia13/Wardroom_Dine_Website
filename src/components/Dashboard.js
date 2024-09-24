@@ -103,6 +103,25 @@ const Dashboard = () => {
               {unit.nonVeg_count}
             </Typography>
           </Box>
+          <Box
+            sx={{
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: "bold", fontSize: "0.9rem" }}
+              mb="5px"
+            >
+              Ty-Dy/ Leave
+            </Typography>
+            <Typography
+              variant="h3"
+              sx={{ fontWeight: "bold", color: "#ffca28 " }}
+            >
+              {unit.tydy.veg + unit.tydy.nonVeg}
+            </Typography>
+          </Box>
         </Box>
       </Box>
 
@@ -131,22 +150,17 @@ const Dashboard = () => {
                 </TableCell>
                 <TableCell>
                   <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                    Email
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                    Phone
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                     Preference
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                    Breakfast
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                    Lunch
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                    Dinner
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -168,23 +182,28 @@ const Dashboard = () => {
                         variant="subtitle1"
                         sx={{ color: "black", fontSize: "1.0rem" }}
                       >
+                        {row.email}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ color: "black", fontSize: "1.0rem" }}
+                      >
+                        {row.phone}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          color:
+                            row.preference === "veg" ? "#6BBE6F" : "#FF4614",
+                          fontSize: "1.0rem",
+                          fontWeight: "bold",
+                        }}
+                      >
                         {row.preference}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{ color: "black", fontSize: "1.0rem" }}
-                      >
-                        {row.breakfast}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{ color: "black", fontSize: "1.0rem" }}
-                      >
-                        {row.lunch}
                       </Typography>
                     </TableCell>
                     <TableCell>

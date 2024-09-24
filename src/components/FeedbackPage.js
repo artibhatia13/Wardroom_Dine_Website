@@ -113,7 +113,7 @@ const FeedbackItem = ({ date, mealType, feedback, userName, menuItem }) => {
           width: "100%",
         }}
       >
-        <Typography variant="subtitle2">{formatDateToString(date)}</Typography>
+        <Typography variant="subtitle2">{date}</Typography>
         <Box
           display="flex"
           alignItems="center"

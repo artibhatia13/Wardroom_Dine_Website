@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Typography, Box, Skeleton } from "@mui/material";
 import { toast } from "react-toastify";
-import { formatDate } from "../services/utility";
+import { formatDate, formatDateToString } from "../services/utility";
 import { fetchTodaysMenu } from "../services/firestoreUtility";
 import { useUnitContext } from "../context/unitContext";
 
@@ -50,6 +50,22 @@ const Headcount = () => {
         </>
       ) : todaysMenu ? (
         <Box mt={6}>
+          <Box
+            display="flex"
+            py={1}
+            width="80%"
+            justifyContent="space-around"
+            alignItems="center"
+            sx={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              mb: 2,
+            }}
+          >
+            <Typography variant="h6" sx={{ textTransform: "uppercase" }} mt={1}>
+              {formatDateToString(todaysMenu.date)}
+            </Typography>
+          </Box>
           <MealBox
             mealType="Breakfast"
             vegCount={todaysMenu.breakfast_count.veg}
