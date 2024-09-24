@@ -52,8 +52,14 @@ const MenuPage = () => {
   }, []);
 
   const CalculateActiveTab = () => {
-    const today = new Date().toLocaleDateString("en-GB").replace(/\//g, "-"); // Format as DD-MM-YYYY
-    const defaultIndex = dailyMenu.findIndex((menu) => menu.date === today);
+    const today = new Date();
+    const formattedToday = `${today.getFullYear()}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}`;
+
+    const defaultIndex = dailyMenu.findIndex(
+      (menu) => menu.date === formattedToday
+    );
     return defaultIndex === -1 ? 0 : defaultIndex;
   };
 
